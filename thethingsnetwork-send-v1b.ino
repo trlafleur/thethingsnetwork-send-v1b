@@ -40,7 +40,7 @@ static const u1_t APPEUI[8]  = { 0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x03, 0x8b 
 
 // LoRaWAN DevEUI, unique device ID (LSBF)
 // Not used in this example
-static const u1_t DEVEUI[8]  = { 0x00, 0x04, 0xa3, 0xff, 0xfe, 0x31, 0x00, 0x01 };
+static const u1_t DEVEUI[8]  = { 0x00, 0x04, 0xa3, 0xff, 0xfe, 0x31, 0x00, 0x02 };
 
 // LoRaWAN NwkSKey, network session key 
 // Use this key for The Things Network
@@ -56,7 +56,7 @@ static const u1_t ARTKEY[16] = { 0x6b, 0x74, 0xcd, 0x4c, 0x4d, 0xea, 0xcf, 0x3f,
 
 // LoRaWAN end-device address (DevAddr)
 // See http://thethingsnetwork.org/wiki/AddressSpace
-static const u4_t DEVADDR = 0x0f1667ca ; // <-- Change this address for every node!
+static const u4_t DEVADDR = 0x91042B1F ; // <-- Change this address for every node!
 
 //////////////////////////////////////////////////
 // APPLICATION CALLBACKS
@@ -81,6 +81,17 @@ uint8_t mydata[] = "Hello, World!";
 static osjob_t sendjob;
 static osjob_t keepalivejob;
 
+
+#ifdef __AVR_ATmega1284P__      // MoteinoMega LoRa
+// Pin mapping
+lmic_pinmap pins = 
+{
+  .nss  = 4,
+  .rxtx = 12,    // Not connected on RFM92/RFM95
+  .rst  = 13,    // Needed on RFM92/RFM95 ??
+  .dio  = {2, 1, 0},
+};
+#elif __SAMD21G18A__            // RocketScream
 // Pin mapping
 lmic_pinmap pins = 
 {
@@ -89,6 +100,9 @@ lmic_pinmap pins =
   .rst  = 9,    // Needed on RFM92/RFM95 ??
   .dio  = {2, 3, 6},
 };
+#else
+#error Processor Radio pins not defined
+#endif
 
 
 /* ***************************************************** */
@@ -223,7 +237,7 @@ void do_send(osjob_t* j)
 /* ***************************************************** */
 void setup() 
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println();
   Serial.println("*** Starting LMiC ***");
   Serial.println();
